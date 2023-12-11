@@ -1,0 +1,71 @@
+<!-- public/chat.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="style_chat.css">
+  <title>Chat.io</title>
+</head>
+<body>
+  <div id="chatPage">
+    <h1>Chat.io'</h1>
+    <div id="chat-container">
+      <div id="mensagens">
+        <!-- Mensagens do chat serão exibidas aqui -->
+      </div>
+      <div id="user-input">
+        <input type="text" id="mensagem" placeholder="Digite sua mensagem">
+        <button onclick="enviarMensagem()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const urlParams = new URLSearchParams(window.location.search);
+    const nomeUsuario = urlParams.get('nomeUsuario');
+
+    // Emite o evento 'entrar' para o servidor
+    socket.emit('entrar', nomeUsuario);
+
+    function enviarMensagem() {
+      const mensagem = document.getElementById('mensagem').value.trim();
+      if (mensagem !== '') {
+        // Emite o evento 'mensagem' para o servidor
+        socket.emit('mensagem', mensagem);
+
+        // Adiciona a mensagem à lista de mensagens localmente
+        const chatMessages = document.getElementById('mensagens');
+        const div = document.createElement('div');
+        div.textContent = `${nomeUsuario}: ${mensagem}`;
+        chatMessages.appendChild(div);
+
+        // Limpa o campo de mensagem
+        document.getElementById('mensagem').value = '';
+      }
+    }
+
+    // Trata o evento 'mensagem' do servidor
+    socket.on('mensagem', (mensagem) => {
+      // Adiciona a mensagem à lista de mensagens apenas se o usuário não for o remetente
+      if (mensagem.indexOf(`${nomeUsuario}:`) === -1) {
+        const chatMessages = document.getElementById('mensagens');
+        const div = document.createElement('div');
+        div.textContent = mensagem;
+        chatMessages.appendChild(div);
+      }
+    });
+
+    // Adiciona a funcionalidade de enviar mensagem ao pressionar Enter
+    document.getElementById('mensagem').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Evita a quebra de linha padrão ao pressionar Enter
+        enviarMensagem();
+      }
+    });
+  </script>
+</body>
+</html>

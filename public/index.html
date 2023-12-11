@@ -1,0 +1,40 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="style_index.css">
+  <title>Chat.io</title>
+</head>
+<body>
+  <div id="mainPage">
+    <h1>Bem-vindo ao Chat.io</h1>
+    <label for="nome">Digite seu nome:</label>
+    <input type="text" id="nome" />
+    <button onclick="entrar()">Entrar</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function entrar() {
+      const nomeUsuario = document.getElementById('nome').value.trim();
+      if (nomeUsuario !== '') {
+        // Redireciona para a página de chat com o nome de usuário como parâmetro de consulta
+        window.location.href = `/chat.html?nomeUsuario=${encodeURIComponent(nomeUsuario)}`;
+      }
+    }
+
+    document.getElementById('nome').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Evita a quebra de linha padrão ao pressionar Enter
+        entrar();
+      }
+    });
+
+  </script>
+</body>
+</html>
