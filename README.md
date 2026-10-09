@@ -4,6 +4,11 @@ A small browser chat example built with Node.js, Express, and Socket.IO. The
 server serves two HTML pages and relays messages between connected clients in a
 single shared room.
 
+This repository is an educational Socket.IO event lab: a small, readable
+example of how events, a room, and broadcasts fit together. For a full chat
+application with channels, persistence, and tests, see the primary chat
+showcase, [Mini Discord](https://github.com/xfelipealves/mini-discord).
+
 ## How the Socket.IO flow works
 
 1. `server.js` creates an Express application, wraps it in an HTTP server, and
@@ -23,7 +28,9 @@ single shared room.
    server broadcasts a departure message.
 
 The event names and room name are part of the current implementation:
-`entrar`, `mensagem`, `disconnect`, and `sala_principal`.
+`entrar`, `mensagem`, `disconnect`, and `sala_principal`. See
+[docs/EVENTS.md](docs/EVENTS.md) for the full event contract, the entry,
+message, and departure flows, and the edge cases.
 
 ## Project structure
 
@@ -32,6 +39,10 @@ The event names and room name are part of the current implementation:
 ├── server.js              # Express and Socket.IO server
 ├── package.json           # Project metadata, scripts, and dependencies
 ├── package-lock.json      # Locked dependency versions
+├── node_modules/          # Installed dependencies, committed to the repository
+├── docs/
+│   ├── EVENTS.md          # Event contract and room flow
+│   └── PORTFOLIO-PLAN.md  # Portfolio plan and next slice
 └── public/
     ├── index.html         # Name entry page
     ├── chat.html          # Chat page and browser-side Socket.IO logic
@@ -40,8 +51,9 @@ The event names and room name are part of the current implementation:
 ```
 
 `server.js` also exposes the files in `public/` as static assets. The
-dependency manifests are `package.json` and `package-lock.json`; run
-`npm install` to install the dependencies needed locally.
+dependency manifests are `package.json` and `package-lock.json`. The
+`node_modules/` directory is also committed, so `node server.js` works right
+after cloning; `npm install` reinstalls the locked versions.
 
 ## Prerequisites
 
@@ -96,6 +108,12 @@ Error: no test specified
 For a basic local smoke check, start the server, open the root page in a
 browser, join with a name, and exchange messages from two tabs or windows.
 
+On 2026-10-09 the unmodified server was checked with Node.js 26 and the
+committed dependencies: `/`, `/chat.html`, the stylesheets, and
+`/socket.io/socket.io.js` returned HTTP 200, and two raw WebSocket clients
+confirmed the entry, message, and departure flows described in
+[docs/EVENTS.md](docs/EVENTS.md). No browser was used for that check.
+
 ## Current limitations
 
 - All users join the same in-memory room, `sala_principal`; there are no
@@ -114,7 +132,13 @@ browser, join with a name, and exchange messages from two tabs or windows.
   workaround, not a message identity protocol.
 - No favicon asset is included, so browsers may request `/favicon.ico` and
   receive a 404 response.
-- `npm test` is not a real test suite yet.
+- Sending `entrar` more than once from the same socket registers duplicate
+  handlers, so that user's messages and departure notice are broadcast more
+  than once.
+- `node_modules/` is committed, which makes the repository larger than
+  necessary.
+- `npm test` is not a real test suite yet. The next planned step is an
+  automated event smoke test; see [docs/PORTFOLIO-PLAN.md](docs/PORTFOLIO-PLAN.md).
 
 ## Contributing
 
